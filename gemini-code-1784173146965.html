@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Catch Game</title>
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --bg-dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-dark);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Pro Start Screen */
+        #ui-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .card {
+            background: var(--glass);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Game Header */
+        header {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+        }
+
+        #game-board {
+            width: 90vw;
+            height: 75vh;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(0, 242, 255, 0.3);
+            border-radius: 15px;
+            position: relative;
+            margin-top: 10px;
+        }
+
+        /* Identity Preserving Target */
+        #target {
+            width: 80px;
+            height: 80px;
+            position: absolute;
+            cursor: crosshair;
+            background-size: contain; 
+            background-repeat: no-repeat;
+            background-position: center;
+            border: 2px solid var(--neon-blue);
+            border-radius: 12px;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        button {
+            background: var(--neon-blue);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-overlay">
+        <div class="card">
+            <h1>Identity Capture</h1>
+            <input type="file" id="imageLoader" accept="image/*">
+            <br>
+            <button id="startBtn">INITIALIZE</button>
+        </div>
+    </div>
+
+    <header>
+        <div>Score: <span id="score">0</span></div>
+    </header>
+
+    <div id="game-board">
+        <div id="target"></div>
+    </div>
+
+    <script>
+        const target = document.getElementById('target');
+        const scoreDisplay = document.getElementById('score');
+        const board = document.getElementById('game-board');
+        const startBtn = document.getElementById('startBtn');
+        const imageLoader = document.getElementById('imageLoader');
+        const overlay = document.getElementById('ui-overlay');
+        
+        let score = 0;
+        let imageURL = '';
+
+        imageLoader.addEventListener('change', (e) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                imageURL = event.target.result;
+                target.style.backgroundImage = `url('${imageURL}')`;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        startBtn.addEventListener('click', () => {
+            if (imageURL) {
+                overlay.style.display = 'none';
+                moveTarget();
+            } else {
+                alert("Please upload your image.");
+            }
+        });
+
+        function moveTarget() {
+            const maxX = board.clientWidth - 80;
+            const maxY = board.clientHeight - 80;
+            target.style.left = Math.floor(Math.random() * maxX) + 'px';
+            target.style.top = Math.floor(Math.random() * maxY) + 'px';
+        }
+
+        target.addEventListener('click', () => {
+            score++;
+            scoreDisplay.textContent = score;
+            moveTarget();
+        });
+    </script>
+</body>
+</html>
